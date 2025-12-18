@@ -1,13 +1,28 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+@theme {
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-outfit: "Outfit", sans-serif;
+}
+
+:root {
+  font-family: var(--font-inter);
+}
+
 h1,
 h2,
 h3,
 h4,
 .font-outfit {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-outfit);
 }
 
 body {
-  @apply bg-gray-50 text-gray-800;
+  background-color: #f9fafb;
+  /* gray-50 */
+  color: #1f2937;
+  /* gray-800 */
 }
 
 /* 自定義動畫 */
@@ -29,5 +44,8 @@ body {
 
 /* 毛玻璃效果 */
 .glass-effect {
-  @apply bg-white/80 backdrop-blur-md border border-white/20;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
