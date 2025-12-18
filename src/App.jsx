@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Truck, Recycle, Trash2, Info, Menu, X, ExternalLink, AlertTriangle, Leaf, Coffee, Box, Smartphone, Droplets, Monitor, MousePointer2 } from 'lucide-react';
+import { Search, Truck, Recycle, Trash2, Info, Menu, X, ExternalLink, AlertTriangle, Leaf, Coffee, Box, Smartphone, Droplets, Monitor } from 'lucide-react';
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [submittedQuery, setSubmittedQuery] = useState(''); // 只有按下按鈕後才更新
-  const [activeTab, setActiveTab] = useState('home');
+  const [submittedQuery, setSubmittedQuery] = useState('');
   const [currentDay, setCurrentDay] = useState('');
-  const [isOfficialTruck, setIsOfficialTruck] = useState(false);
 
   // 完整資料庫
   const wasteDatabase = [
@@ -37,17 +35,22 @@ const App = () => {
     setCurrentDay(days[d.getDay()]);
   }, []);
 
-  // 動態建議標籤：根據目前輸入的內容過濾
+  // 當輸入欄位變成空白時，自動清空提交的搜尋結果，回到初始狀態
+  useEffect(() => {
+    if (searchTerm === '') {
+      setSubmittedQuery('');
+    }
+  }, [searchTerm]);
+
   const getDynamicSuggestions = () => {
     if (!searchTerm) {
-      return ['廚餘', '電池', '紙容器', '廢紙']; // 預設推薦
+      return ['廚餘', '電池', '紙容器', '廢紙'];
     }
-    // 從資料庫中找尋匹配的名稱或標籤
     const matches = wasteDatabase
       .filter(item => item.name.includes(searchTerm) || item.label.includes(searchTerm))
-      .map(item => item.name.split('/')[0].split('(')[0].trim()) // 簡化名稱
-      .filter((value, index, self) => self.indexOf(value) === index) // 去重
-      .slice(0, 4); // 最多顯示 4 個
+      .map(item => item.name.split('/')[0].split('(')[0].trim())
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .slice(0, 4);
 
     return matches.length > 0 ? matches : ['一般垃圾', '資源回收'];
   };
@@ -57,13 +60,6 @@ const App = () => {
     if (!finalQuery) return;
     setSubmittedQuery(finalQuery);
     setSearchTerm(finalQuery);
-    setActiveTab('search-results');
-  };
-
-  const clearSearch = () => {
-    setSearchTerm('');
-    setSubmittedQuery('');
-    setActiveTab('home');
   };
 
   const filteredItems = wasteDatabase.filter(item =>
@@ -87,7 +83,6 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-emerald-600 text-white shadow-md">
         <div className="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -106,7 +101,6 @@ const App = () => {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 pt-8 space-y-8">
-        {/* Search Hero */}
         <div className="bg-white p-8 rounded-3xl shadow-xl shadow-emerald-900/5 border border-emerald-50 animate-slide-up">
           <h2 className="text-xl font-bold text-slate-800 mb-6 text-center">今天想丟什麼？</h2>
           <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="relative flex gap-2">
@@ -128,7 +122,6 @@ const App = () => {
             </button>
           </form>
 
-          {/* Dynamic Suggestions */}
           <div className="mt-6">
             <p className="text-[10px] font-bold text-slate-400 uppercase text-center mb-3 tracking-widest">
               {searchTerm ? '您是不是要找...' : '常用推薦'}
@@ -147,16 +140,12 @@ const App = () => {
           </div>
         </div>
 
-        {/* Results Area - 僅在提交後顯示 */}
-        {submittedQuery && (
+        {submittedQuery ? (
           <div className="space-y-4 animate-slide-up">
-            <div className="flex justify-between items-center px-2">
+            <div className="px-2">
               <h3 className="font-bold text-slate-500 text-xs uppercase tracking-widest">
                 「{submittedQuery}」的查詢結果
               </h3>
-              <button onClick={clearSearch} className="text-xs font-bold text-rose-500 flex items-center gap-1 hover:bg-rose-50 px-2 py-1 rounded-lg transition-colors">
-                <X className="w-3 h-3" /> 清除結果
-              </button>
             </div>
 
             <div className="grid gap-4">
@@ -180,15 +169,12 @@ const App = () => {
               ) : (
                 <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200">
                   <Info className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-500 font-medium">找不到關於「{submittedQuery}」的紀錄<br /><span className="text-xs text-slate-400 italic">建議依照「一般垃圾」處理或詢問社區管理員</span></p>
+                  <p className="text-slate-500 font-medium">找不到關於「{submittedQuery}」的紀錄</p>
                 </div>
               )}
             </div>
           </div>
-        )}
-
-        {/* Dashboard View - 搜尋前顯示的有用資訊 */}
-        {!submittedQuery && (
+        ) : (
           <div className="space-y-6 animate-slide-up">
             <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100 shadow-sm flex items-start gap-4">
               <div className="bg-white p-3 rounded-2xl shadow-sm">
@@ -200,32 +186,31 @@ const App = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <a href="https://route.tyoem.gov.tw/" target="_blank" rel="noreferrer" className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center hover:bg-slate-50 transition-colors">
                 <Truck className="w-8 h-8 text-blue-500 mb-2" />
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1">桃園市垃圾車</p>
-                <a href="https://route.tyoem.gov.tw/" target="_blank" rel="noreferrer" className="text-xs font-black text-slate-700 flex items-center gap-1">即時動態 <ExternalLink className="w-3 h-3" /></a>
-              </div>
+                <span className="text-xs font-black text-slate-700 flex items-center gap-1">即時動態追蹤 <ExternalLink className="w-3 h-3" /></span>
+              </a>
               <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center">
                 <AlertTriangle className="w-8 h-8 text-amber-500 mb-2" />
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1">巨大垃圾預約</p>
-                <p className="text-xs font-black text-slate-700">03-332-8419</p>
+                <p className="text-xs font-black text-slate-700">桃園區: 03-332-8419</p>
               </div>
             </div>
           </div>
         )}
       </main>
 
-      {/* Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 px-10 py-4 flex justify-between items-center z-50">
-        <button onClick={clearSearch} className={`flex flex-col items-center gap-1 ${!submittedQuery ? 'text-emerald-600' : 'text-slate-400'}`}>
+        <button onClick={() => setSearchTerm('')} className={`flex flex-col items-center gap-1 ${!submittedQuery ? 'text-emerald-600' : 'text-slate-400'}`}>
           <Menu className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase">選單</span>
         </button>
         <button className="w-14 h-14 bg-emerald-600 rounded-full flex items-center justify-center text-white shadow-xl -mt-10 border-4 border-white">
           <Search className="w-6 h-6" />
         </button>
-        <button onClick={() => { }} className="flex flex-col items-center gap-1 text-slate-400">
+        <button className="flex flex-col items-center gap-1 text-slate-400">
           <Info className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase">指南</span>
         </button>
