@@ -9,7 +9,7 @@ const App = () => {
   // 完整擴充資料庫 (環境部標準)
   const wasteDatabase = [
     { id: 1, name: '廢乾電池/水銀電池', category: 'resource', label: '資源垃圾', instruction: '處理：應與一般垃圾分開，交付資源回收車、超商或量販店回收箱。', icon: <Zap className="w-6 h-6" /> },
-    { id: 2, name: '廢資訊物品 (電腦/螢幕/印表機)', category: 'resource', label: '資源垃圾', instruction: '處理：包含主機、顯示器。印表機印表機碳粉匣應分開交付資收車。', icon: <Monitor className="w-6 h-6" /> },
+    { id: 2, name: '廢資訊物品 (電腦/螢幕/印表機)', category: 'resource', label: '資源垃圾', instruction: '處理：包含主機、顯示器。印表機碳粉匣應分開交付資收車。', icon: <Monitor className="w-6 h-6" /> },
     { id: 3, name: '廢電子電器 (電視/冰箱/洗衣機)', category: 'resource', label: '資源垃圾', instruction: '處理：大型家電可聯繫清潔隊或逆向回收通路。不可隨意棄置路邊。', icon: <Monitor className="w-6 h-6" /> },
     { id: 4, name: '廢照明光源 (燈管/燈泡)', category: 'resource', label: '資源垃圾', instruction: '處理：需完整不可打破。含汞燈管若打破，需用厚紙包妥避免割傷。', icon: <Zap className="w-6 h-6" /> },
     { id: 26, name: '水銀體溫計', category: 'resource', label: '資源垃圾', instruction: '狀態：含汞危險品。打破時禁止使用吸塵器，密封後交資源回收車。完整品需單獨袋裝。', icon: <FlaskConical className="w-6 h-6" /> },
@@ -32,16 +32,6 @@ const App = () => {
   useEffect(() => {
     if (searchTerm === '') setSubmittedQuery('');
   }, [searchTerm]);
-
-  const getDynamicSuggestions = () => {
-    if (!searchTerm) return ['體溫計', '光碟', '碳粉匣', '農藥瓶', '廚餘'];
-    const matches = wasteDatabase
-      .filter(item => item.name.includes(searchTerm) || item.label.includes(searchTerm))
-      .map(item => item.name.split('/')[0].split('(')[0].trim())
-      .filter((v, i, a) => a.indexOf(v) === i)
-      .slice(0, 4);
-    return matches.length > 0 ? matches : ['一般垃圾', '資源垃圾'];
-  };
 
   const handleSearch = (q) => {
     const final = q || searchTerm;
@@ -100,19 +90,7 @@ const App = () => {
               搜尋
             </button>
           </form>
-
-          <div className="mt-6">
-            <p className="text-[10px] font-bold text-slate-400 uppercase text-center mb-3 tracking-widest">
-              {searchTerm ? '您是不是要找...' : '重點百科項目'}
-            </p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {getDynamicSuggestions().map(tag => (
-                <button key={tag} onClick={() => handleSearch(tag)} className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all border border-emerald-100 shadow-sm active:scale-95">
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* 已移除建議按鈕 */}
         </div>
 
         {submittedQuery && (
@@ -166,13 +144,13 @@ const App = () => {
                   <p className="text-xs text-indigo-700 leading-relaxed">不可使用吸塵器。應用硬紙片、膠帶收集汞珠，放入裝有水的密封容器標註交付回收車。資源回收專線：**0800-085717**。</p>
                 </div>
                 <div className="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100">
-                  <h4 className="font-bold text-emerald-900 text-sm mb-3">再利用：再紙張環保準則</h4>
+                  <h4 className="font-bold text-emerald-900 text-sm mb-3">再利用：紙張環保準則</h4>
                   <p className="text-xs text-emerald-700 leading-relaxed">乾淨紙張應回收。沾有油漬(如便當紙墊)或複寫紙、蠟紙屬一般垃圾。</p>
                 </div>
               </div>
             </div>
             <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100 flex items-start gap-4">
-              <AlertTriangle className="w-6 h-6 text-amber-600 mt-1 flex-shrink-0" /><p className="text-xs text-amber-700 leading-relaxed font-bold">目前進度：已根據環境部標準對齊三類分類法 (資源、廚餘、一般垃圾)。</p>
+              <AlertTriangle className="w-6 h-6 text-amber-600 mt-1 flex-shrink-0" /><p className="text-xs text-amber-700 leading-relaxed font-bold">做好垃圾強制分類：資源、廚餘、一般垃圾。</p>
             </div>
           </div>
         )}
